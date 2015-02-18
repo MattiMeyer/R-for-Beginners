@@ -1,0 +1,142 @@
+---
+title: "Graphics for Beginners"
+author: "Matti Meyer"
+date: "18.02.2015"
+output: html_document
+---
+
+#Packages
+```{r}
+library(car)
+library(knitr)
+library(foreign)
+````
+
+#Reading the data
+We use a data set from the Department of Psychology of the Univerity of Colorado about Interests of people
+[id]:http://psych.colorado.edu/~carey/Courses/PSYC7291/ClassDataSets.htm. It is a spss data, so we need the package foreign to read the data set and to convert it to a data frame.
+````{r}
+interest <- as.data.frame(read.spss("/home/matti/Arbeitsfläche/interest.sav"))
+#file.choose() a good help
+````
+
+we have to change the label of the gender, because the plots will better with it:
+```````{r}
+interest$gender  <- recode(interest$gender, '1="female" ; 2="male" ')
+
+```````
+
+#graphs for categorial variables
+
+In this chapter we look for nominally and ordinal scaled variables
+
+#Histogram with absolute frequency
+
+Wir erstellen aus der Variable wohnort.alt ein Säulendiagramm. vorher müssen wir aber die table() Funktion anwenden, da wir sonst keinen Vektor haben.
+
+!!!!Allerdings müssen die Zahlen erst noch umkodiert werden!
+```{r}
+Wohn  <-  table(Erstis$wohnort.alt)
+
+```````
+
+``````{r}
+barplot(Wohn)
+
+``````
+
+
+\subsection{Säulendiagramme mit relativen Häufigkeiten}
+
+``````{r}
+barplot(prop.table(Wohn))
+``````
+
+``````{r}
+barplot(prop.table(Wohn), horiz = T ,las=1)
+```````
+
+Die Verbindung zweier Variablen:
+
+
+
+
+
+``````{r}
+table(Erstis$wohnort.alt, Erstis$geschl)
+barplot(table(Erstis$wohnort.alt, Erstis$geschl), legend=T)
+`````````
+
+
+
+`````{r}
+barplot(table(Erstis$wohnort.alt, Erstis$geschl), legend=T,beside=T)
+```````
+
+\subsection{Kreisdiagramme}
+
+`````````{r}
+pie(table(Erstis$wohnort.alt))
+````````
+
+\section{Diagramme für metrische Variablen}
+
+Wir müssen als erstes die Faktoren in Vektoren umwandeln mit der as.numeric() Funktion. Dann bilden wir mit der barplot Funktion ein Säulendiagramm.
+<<fig=T>>=
+Erstis$lz.1  <-  as.numeric(Erstis$lz.1)
+barplot(Erstis$lz.1)
+@
+
+Nun ein Histogramm:
+```````{r}
+
+hist(Erstis$lz.1)
+
+`````
+
+Nun ein Histogramm, mit 20 Säulen und einer angedeuteten Normalverteilung:
+
+```````{r}
+mittelwert  <-  mean(Erstis$lz.1, na.rm=T)
+sd  <-  sd(Erstis$lz.1, na.rm = T)
+hist(Erstis$lz.1, breaks=10)
+curve(dnorm(x, mittelwert, sd)*length(Erstis$lz.1), add=T)
+
+
+``````
+
+Manchmal ist es unforderlich ein Histogramm zu interpretieren, da es von der Anzahl von Balken abhängt. Besser ist es da ein Kerndichtediagramm zu nehmen, dass eine durchgezogene Linie verwendet:
+
+````````{r}
+
+plot(density(Erstis$lz.1, na.rm = T))
+curve(dnorm(x, mittelwert, sd), add=T, lty=2)
+
+``````
+
+\newpage
+\section{Boxplot}
+
+Boxplots sind wichtig für die explorative Datenanalyse und geben Eigenschaften über die Verteilung an. Hier das Alter der VPN:
+
+`````````{r}
+Erstis$alter  <- as.numeric(Erstis$alter)
+boxplot(Erstis$alter)
+`````````
+
+
+Für Boxplots über mehrere Variablen kann man mehrere Variablen darstellen lassen:
+````````{r}
+Erstis$gs.1  <- as.numeric(Erstis$gs.1)
+Erstis$ru.1  <- as.numeric(Erstis$ru.1)
+Erstis$wm.1  <- as.numeric(Erstis$wm.1)
+boxplot(data.frame(Erstis$gs.1, Erstis$ru.1, Erstis$wm.1))
+`````````
+
+Um Boxplots über versch. Gruppe nausgeben zu lassen benutzt man die tilde. Außerdem finden wir mit der identify() Funktion Ausreißerwerte heraus. Diese könne nwir dann im Daigramm anklicken und uns hersausgeben lassen:
+
+````````{r}
+boxplot(Erstis$alter ~ Erstis$geschl)
+identify(Erstis$geschl, Erstis$alter)
+```````
+
